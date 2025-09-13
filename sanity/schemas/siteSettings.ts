@@ -35,6 +35,25 @@ export default defineType({
       title: 'Lien du Menu PDF',
       type: 'url',
       validation: Rule => Rule.required()
+    }),
+    // New fields for MenuModal
+    defineField({
+      name: 'menuTitle',
+      title: 'Titre du Menu Modal',
+      type: 'string',
+      initialValue: 'Notre Menu'
+    }),
+    defineField({
+      name: 'contactPhone',
+      title: 'Numéro de Téléphone',
+      type: 'string',
+      initialValue: '06 66 10 31 11'
+    }),
+    defineField({
+      name: 'menuFooterText',
+      title: 'Texte du Footer du Menu',
+      type: 'string',
+      initialValue: 'Pour toute question sur nos produits, n\'hésitez pas à nous contacter au'
     })
   ]
 })
