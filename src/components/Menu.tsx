@@ -1,8 +1,23 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Star, Heart, ThumbsUp } from 'lucide-react';
+import { getReviewsData } from '../lib/sanity';
 
-const Menu: React.FC = () => {
-  const reviews = [
+interface ReviewsData {
+  title?: string;
+  description?: string;
+  reviewsList?: Array<{
+    name: string;
+    rating: number;
+    comment: string;
+  }>;
+}
+
+const Reviews: React.FC = () => {
+  const [reviewsData, setReviewsData] = useState<ReviewsData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Fallback reviews
+  const fallbackReviews = [
     {
       name: 'Maëlle D.',
       rating: 5,
@@ -35,6 +50,21 @@ const Menu: React.FC = () => {
     }
   ];
 
+  useEffect(() => {
+    const fetchReviewsData = async () => {
+      try {
+        const data = await getReviewsData();
+        setReviewsData(data);
+      } catch (error) {
+        console.error('Error fetching reviews data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReviewsData();
+  }, []);
+
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, index) => (
       <Star
@@ -46,15 +76,35 @@ const Menu: React.FC = () => {
     ));
   };
 
+  // Content with fallbacks
+  const title = reviewsData?.title || "Ce que disent nos clients";
+  const description = reviewsData?.description || "Découvrez les avis de nos clients qui font confiance à L'Atelier du Sandwich.";
+  const reviews = reviewsData?.reviewsList?.length ? reviewsData.reviewsList : fallbackReviews;
+
+  if (loading) {
+    return (
+      <section id="avis-clients" className="py-12 sm:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+          <div className="text-gray-500">Chargement...</div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="avis-clients" className="py-12 sm:py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 sm:mb-16">
           <h2 className="text-xl xs:text-2xl sm:text-3xl lg:text-4xl font-bold text-black mb-4 px-4">
-            Ce que disent nos <span className="text-orange-500">clients</span>
+            {title.split(' ').map((word, index) => {
+              if (word.toLowerCase().includes('clients')) {
+                return <span key={index} className="text-orange-500">{word}</span>;
+              }
+              return word + ' ';
+            })}
           </h2>
           <p className="text-sm xs:text-base sm:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto px-6">
-            Découvrez les avis de nos clients qui font confiance à L'Atelier du Sandwich.
+            {description}
           </p>
         </div>
 
@@ -82,4 +132,4 @@ const Menu: React.FC = () => {
   );
 };
 
-export default Menu;
+export default Reviews;
