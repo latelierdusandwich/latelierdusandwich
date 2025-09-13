@@ -9,9 +9,9 @@ interface SiteSettings {
 
 interface ContactData {
   address?: {
-    street: string;
-    city: string;
-    postalCode: string;
+    street?: string;
+    city?: string;
+    postalCode?: string;
   };
   phone?: string;
   googleMapsUrl?: string;
@@ -53,7 +53,7 @@ const Header: React.FC = () => {
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      const headerHeight = 120; // Hauteur approximative du header avec top bar
+      const headerHeight = 120; // approximate header + top bar height
       const elementPosition = element.offsetTop - headerHeight;
       window.scrollTo({
         top: elementPosition,
@@ -74,19 +74,22 @@ const Header: React.FC = () => {
 
   // Content with fallbacks
   const siteName = siteSettings?.title || "L'Atelier du Sandwich";
-  
-  // Address formatting
-  const address = contactData?.address 
-    ? {
-        full: `${contactData.address.street}, ${contactData.address.postalCode} ${contactData.address.city}`,
-        short: `${contactData.address.city} ${contactData.address.postalCode.substring(0, 2)}ème`
-      }
-    : {
-        full: "3 Pl. Félix Baret, 13006 Marseille",
-        short: "Marseille 6ème"
-      };
-  
+
+  // Address formatting with safe checks
+  const addrStreet = contactData?.address?.street ?? '';
+  const addrPostal = contactData?.address?.postalCode ?? '';
+  const addrCity = contactData?.address?.city ?? '';
+
+  const address = {
+    full:
+      `${addrStreet}${addrStreet && (addrPostal || addrCity) ? ', ' : ''}${addrPostal} ${addrCity}`.trim() ||
+      "3 Pl. Félix Baret, 13006 Marseille",
+    short: `${addrCity} ${addrPostal ? addrPostal.substring(0, 2) + 'ème' : ''}`.trim() || "Marseille 6ème",
+    veryShort: addrCity || "Marseille"
+  };
+
   const phone = contactData?.phone || "06 66 10 31 11";
+  const telHref = `tel:${phone.replace(/\s/g, '')}`;
   const mapsUrl = contactData?.googleMapsUrl || "https://maps.app.goo.gl/jNNiNZsNaeHQFTeR8";
   const specialNotice = hoursData?.specialNotice || "Fermé les jours fériés";
 
@@ -94,28 +97,37 @@ const Header: React.FC = () => {
     <>
       <header className="bg-black text-white sticky top-0 z-50 shadow-lg">
         {/* Top bar with contact info */}
-        <div className="bg-gray-900 py-2 px-4 text-xs sm:text-sm">
-          <div className="max-w-7xl mx-auto flex justify-between items-center">
-            <div className="flex items-center space-x-2 sm:space-x-4">
-              <div className="hidden sm:flex items-center space-x-1">
-                <MapPin className="w-4 h-4 text-orange-500" />
-                <span>{address.full}</span>
-              </div>
-              <div className="flex sm:hidden items-center space-x-1">
-                <MapPin className="w-3 h-3 text-orange-500" />
-                <span>{address.short}</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <Phone className="w-3 h-3 sm:w-4 sm:h-4 text-orange-500" />
-                <a 
-                  href={`tel:${phone.replace(/\s/g, '')}`}
-                  className="hover:text-orange-500 transition-colors"
-                >
-                  {phone}
-                </a>
+        <div className="bg-gray-900 py-3 px-4 text-sm sm:text-sm">
+          <div className="max-w-7xl mx-auto flex justify-between items-start">
+            {/* LEFT: stacked rows (address then phone). Icons in same column so alignment is consistent */}
+            <div className="min-w-0">
+              <div className="flex flex-col space-y-1 min-w-0">
+                {/* Address row */}
+                <div className="flex items-start space-x-2 min-w-0">
+                  <MapPin className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" />
+                  {/* full address always shown; it can wrap */}
+                  <span className="whitespace-normal leading-snug text-sm block" title={address.full}>
+                    {address.full}
+                  </span>
+                </div>
+
+                {/* Phone row */}
+                <div className="flex items-center space-x-2 min-w-0">
+                  <Phone className="w-4 h-4 text-orange-500 flex-shrink-0" />
+                  <a
+                    href={telHref}
+                    aria-label={`Call ${phone}`}
+                    className="hover:text-orange-500 transition-colors whitespace-nowrap text-sm"
+                    title={phone}
+                  >
+                    {phone}
+                  </a>
+                </div>
               </div>
             </div>
-            <div className="hidden lg:block text-orange-500 font-medium">
+
+            {/* RIGHT: special notice (hidden on small screens) */}
+            <div className="hidden lg:block text-orange-500 font-medium self-center">
               {specialNotice}
             </div>
           </div>
@@ -130,7 +142,11 @@ const Header: React.FC = () => {
             >
               {siteName.split(' ').map((word, index) => {
                 if (word.toLowerCase().includes('sandwich')) {
-                  return <span key={index} className="text-orange-500">{word}</span>;
+                  return (
+                    <span key={index} className="text-orange-500">
+                      {word}{' '}
+                    </span>
+                  );
                 }
                 return word + ' ';
               })}
@@ -177,6 +193,7 @@ const Header: React.FC = () => {
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="text-white hover:text-orange-500 transition-colors duration-200"
+                aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
               >
                 {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
