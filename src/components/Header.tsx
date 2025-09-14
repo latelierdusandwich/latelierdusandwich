@@ -99,25 +99,29 @@ const Header: React.FC = () => {
         {/* Top bar with contact info */}
         <div className="bg-gray-900 py-3 px-4 text-sm sm:text-sm">
           <div className="max-w-7xl mx-auto flex justify-between items-start">
-            {/* LEFT: stacked rows (address then phone). Icons in same column so alignment is consistent */}
+            {/* LEFT: stack on mobile, inline on md+ */}
             <div className="min-w-0">
-              <div className="flex flex-col space-y-1 min-w-0">
-                {/* Address row */}
-                <div className="flex items-start space-x-2 min-w-0">
-                  <MapPin className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" />
-                  {/* full address always shown; it can wrap */}
-                  <span className="whitespace-normal leading-snug text-sm block" title={address.full}>
+              {/* flex-col on mobile, flex-row on md (items centered on md) */}
+              <div className="flex flex-col md:flex-row md:items-center md:space-x-8 min-w-0">
+                {/* Address */}
+                <div className="flex items-start md:items-center space-x-2 min-w-0">
+                  {/* mt on mobile only so icon lines up with first line of wrapped address; removed on md */}
+                  <MapPin className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5 md:mt-0" />
+                  <span
+                    className="whitespace-normal leading-snug text-sm block"
+                    title={address.full}
+                  >
                     {address.full}
                   </span>
                 </div>
 
-                {/* Phone row */}
-                <div className="flex items-center space-x-2 min-w-0">
-                  <Phone className="w-4 h-4 text-orange-500 flex-shrink-0" />
+                {/* Phone: will appear to the right of address on md */}
+                <div className="flex items-start md:items-center space-x-2 min-w-0 mt-1 md:mt-0">
+                  <Phone className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5 md:mt-0" />
                   <a
                     href={telHref}
                     aria-label={`Call ${phone}`}
-                    className="hover:text-orange-500 transition-colors whitespace-nowrap text-sm"
+                    className="hover:text-orange-500 transition-colors whitespace-nowrap text-sm leading-snug"
                     title={phone}
                   >
                     {phone}
