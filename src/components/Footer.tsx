@@ -131,28 +131,35 @@ const Footer: React.FC = () => {
 
   // Updated "Created with ♥ by Vasseo" component to match the exact styling from the image
   const CreatedByExact: React.FC = () => {
-    const content = (
-      <span className="inline-flex items-center space-x-1.5 text-gray-400 text-xs hover:text-orange-500 transition-colors duration-200">
-        <span>Created with</span>
-        <svg
-          width="14"
-          height="12"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="text-orange-500"
-        >
-          <path
-            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-        <span>by Vasseo</span>
-      </span>
-    );
+  const handleClick = () => {
+    window.open('https://www.vasseo.com', '_blank');
+  };
+
+  const content = (
+    <span 
+      className="inline-flex items-center space-x-1.5 text-gray-400 text-xs hover:text-orange-500 transition-colors duration-200 cursor-pointer"
+      onClick={handleClick}
+    >
+      <span>Created with</span>
+      <svg
+        width="14"
+        height="12"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className="text-orange-500"
+      >
+        <path
+          d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+      <span>by Vasseo</span>
+    </span>
+  );
 
     if (footerData?.createdByUrl) {
       return (
